@@ -16,6 +16,11 @@ const instance = axios.create({
     }
 });
 
+const get = async <T>(endpoint: string) => {
+    const res = await instance.get<T>(endpoint);
+    return res.data;
+}
+
 /**
  * Search Hacker News Stories
  *
@@ -23,9 +28,7 @@ const instance = axios.create({
  * @param page Page of search results to get
  */
 export const search = async (query: string, page = 0) => {
-	// https://hn.algolia.com/api/v1/search?query=tesla&tags=story&page=0
-	const res = await instance.get<HN_SearchResponse>(`/search?query=${query}&tags=story&page=${page}`);
-	return res.data;
+	return get<HN_SearchResponse>(`/search?query=${query}&tags=story&page=${page}`);
 }
 
 /**
@@ -35,8 +38,6 @@ export const search = async (query: string, page = 0) => {
  * @param page Page of search results to get
  */
 export const searchByDate = async (query: string, page = 0) => {
-	// https://hn.algolia.com/api/v1/search?query=tesla&tags=story&page=0
-	const res = await instance.get<HN_SearchResponse>(`/search_by_date?query=${query}&tags=story&page=${page}`);
-	return res.data;
+	return get<HN_SearchResponse>(`/search_by_date?query=${query}&tags=story&page=${page}`);
 }
 

@@ -9,7 +9,6 @@ interface PaginationProps {
 
 const Pagination: React.FC<PaginationProps> = ( { currentPage, totalPages, onPageChange} ) => {
     
-
     return (
         <div className="d-flex justify-content-between align-items-center">
             <Button
