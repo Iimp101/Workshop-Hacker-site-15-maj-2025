@@ -1,14 +1,22 @@
 import Container from "react-bootstrap/Container";
+import clsx from "clsx";
 import { Routes, Route } from "react-router";
 import Navigation from "./components/Navigation";
 import HomePage from "./pages/HomePage";
 import NotFoundPage from "./pages/NotFoundPage";
 import SearchPage from "./pages/SearchPage";
 import "./assets/scss/App.scss";
+import useTheme from "./hooks/useTheme";
 
 function App() {
+	const { isDarkMode } = useTheme();
+	const appCssclasses = clsx({
+		"bg-white": !isDarkMode,
+		"text-dark": !isDarkMode,
+	});
+
 	return (
-		<div id="App">
+		<div id="App" className={appCssclasses}>
 			<Navigation />
 
 			<Container className="py-3">
