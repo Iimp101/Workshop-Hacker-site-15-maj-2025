@@ -12,11 +12,26 @@ const RandomDogPage = () => {
 			<h1>A random doggo 🐶</h1>
 
             <div className="mb-3">
-                <Button className="mb-3" onClick={() => setUrl("https://dog.ceo/api/breeds/image/random")}>
+
+                <Button className="ms-1" onClick={() => setUrl("https://dog.ceo/api/breeds/image/random")}>
                     Random Doggo
                 </Button>
-                <Button className="mb-3" onClick={() => setUrl("https://dog.ceo/api/breeds/shiba/images/random")}>
-                    Random Shiba doggo
+
+                <Button className="ms-1" onClick={() => setUrl("https://dog.ceo/api/breeds/shiba/images/random")}>
+                    Random Shiba fluffer
+                </Button>
+
+                <Button
+					className="ms-1"
+					onClick={() => {}}>
+                        MOAR doggos 🐶❤️!!
+                </Button>
+
+				<Button
+					className="ms-1"
+					variant="warning"
+					onClick={() => {}}>
+                        Make things go 💣
                 </Button>
             </div>
 			{isLoading && <p>Fetching doggos 🐶...</p>}
