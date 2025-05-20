@@ -1,17 +1,12 @@
+import Button from "react-bootstrap/Button";
 import Container from "react-bootstrap/Container";
 import Navbar from "react-bootstrap/Navbar";
 import Nav from "react-bootstrap/Nav";
-import Button from "react-bootstrap/Button";
 import { Link, NavLink } from "react-router";
-import { useContext } from "react";
-import { ThemeContext } from "../contexts/ThemeContextProvider";
+import useTheme from "../hooks/useTheme";
 
 const Navigation = () => {
-	const themeContext = useContext(ThemeContext);
-	if (!themeContext) {
-		throw new Error("Trying to use ThemeContext outside of its provider");
-	}
-	const { isDarkMode ,toggleTheme } = themeContext;
+	const { isDarkMode, toggleTheme } = useTheme();
 
 	return (
 		<Navbar bg="dark" variant="dark" expand="md">
@@ -21,11 +16,13 @@ const Navigation = () => {
 				<Navbar.Toggle aria-controls="basic-navbar-nav" />
 				<Navbar.Collapse id="basic-navbar-nav">
 					<Nav className="ms-auto">
-						<Nav.Link as={NavLink} end to="/search">Search</Nav.Link>
+						<Nav.Link as={NavLink} end to="/random-dog">🐶 Random dog</Nav.Link>
+						<Nav.Link as={NavLink} end to="/search">🔎 Search</Nav.Link>
 					</Nav>
-						<Button onClick={toggleTheme} variant="outline-secondary">
-							{isDarkMode ? "Dark 🌑" : "Light ☀️"}
-						</Button>
+
+					<Button onClick={toggleTheme} variant="outline-secondary">
+						{isDarkMode ? "☀️" : "🌙"}
+					</Button>
 				</Navbar.Collapse>
 			</Container>
 		</Navbar>
