@@ -15,10 +15,13 @@ const SearchPage = () => {
 	const [searchResult, setSearchResult] = useState<HN_SearchResponse | null>(null);
 	const [currentPage, setCurrentPage] = useState(0);
 	const [pendingPage, setPendingPage] = useState<number | null>(null);
+	// A different way to type autoFocus (longer PART 1)
+	// const inputSearchEl = useRef<HTMLInputElement | null>(null)
 	const queryRef = useRef("");
 	const reqRef = useRef(0);
 
 	const searchHackerNews = async (searchQuery: string, page = 0) => {
+		console.log(`Search for ${searchQuery} and page ${SearchPage}`);
 		// reset state + set loading to true
 		setError(false);
 		setIsLoading(true);
@@ -65,6 +68,15 @@ const SearchPage = () => {
 		// search for haxx0rs 🕵🏻‍♂️
 		searchHackerNews(trimmedSearchInput, 0);
 	}
+
+	// A different way to type focus part 2 (longer!)
+/* 	useEffect(() => {
+		if (!inputSearchEl.current) {
+			return;
+		}
+
+		inputSearchEl.current.focus();
+	}, []); */
 
 	return (
 		<>
