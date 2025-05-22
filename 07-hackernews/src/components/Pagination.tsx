@@ -1,35 +1,46 @@
-import React from "react";
 import Button from "react-bootstrap/Button";
 
 interface PaginationProps {
-    currentPage: number;
-    totalPages: number;
-    onPageChange: (page: number) => void
+	hasNextPage: boolean;
+	hasPreviousPage: boolean;
+	onNextPage: () => void;
+	onPreviousPage: () => void;
+	page: number;
+	totalPages?: number;
 }
 
-const Pagination: React.FC<PaginationProps> = ( { currentPage, totalPages, onPageChange} ) => {
-    
-    return (
-        <div className="d-flex justify-content-between align-items-center">
-            <Button
-                variant="primary"
-                disabled={currentPage === 0}
-                onClick={() => onPageChange(currentPage - 1)}
-            >
-                Previous
-            </Button>
+const Pagination: React.FC<PaginationProps> = ({
+	hasPreviousPage,
+	hasNextPage,
+	onNextPage,
+	onPreviousPage,
+	page,
+	totalPages,
+}) => {
+	return (
+		<div className="d-flex justify-content-between align-items-center">
+			<div className="prev">
+				<Button
+					disabled={!hasPreviousPage}
+					onClick={onPreviousPage}
+					variant="primary"
+				>Previous Page</Button>
+			</div>
 
-            <div>PAGE {currentPage + 1} of {totalPages}</div>
-            
-            <Button
-                variant="primary"
-                disabled={currentPage + 1 >= totalPages}
-                onClick={() => onPageChange(currentPage + 1)}
-            >
-                Next
-            </Button>
-        </div>
-    )
+			<div className="page">
+				Page {page}
+				{totalPages && "/" + totalPages}
+			</div>
+
+			<div className="next">
+				<Button
+					disabled={!hasNextPage}
+					onClick={onNextPage}
+					variant="primary"
+				>Next Page</Button>
+			</div>
+		</div>
+	)
 }
 
 export default Pagination;

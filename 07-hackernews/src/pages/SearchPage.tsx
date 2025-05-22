@@ -1,56 +1,52 @@
-/* eslint-disable no-constant-binary-expression */
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Alert from "react-bootstrap/Alert";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import ListGroup from "react-bootstrap/ListGroup";
+import { useSearchParams } from "react-router";
+import Pagination from "../components/Pagination";
 import { HN_SearchResponse } from "../services/HacknewsAPI.types";
 import { searchByDate } from "../services/HackerNewsAPI";
-import Pagination from "../components/Pagination";
 
 const SearchPage = () => {
 	const [error, setError] = useState<string | false>(false);
 	const [isLoading, setIsLoading] = useState(false);
 	const [inputSearch, setInputSearch] = useState("");
+	const [page, setPage] = useState(0);
 	const [searchResult, setSearchResult] = useState<HN_SearchResponse | null>(null);
-	const [currentPage, setCurrentPage] = useState(0);
-	const [pendingPage, setPendingPage] = useState<number | null>(null);
-	// A different way to type autoFocus (longer PART 1)
-	// const inputSearchEl = useRef<HTMLInputElement | null>(null)
-	const queryRef = useRef("");
-	const reqRef = useRef(0);
+	const inputSearchEl = useRef<HTMLInputElement>(null);
+	const [searchParams, setSearchParams] = useSearchParams();
 
-	const searchHackerNews = async (searchQuery: string, page = 0) => {
-		console.log(`Search for ${searchQuery} and page ${SearchPage}`);
+	// get "query=" from URL
+	const searchParamsQuery = searchParams.get("query");  // search?query=tesla
+
+	console.log("searchParamsQuery", searchParamsQuery);
+
+	const searchHackerNews = async (searchQuery: string, searchPage: number) => {
+		console.log(`Searching for "${searchQuery}" and page ${searchPage}`);
+
 		// reset state + set loading to true
 		setError(false);
 		setIsLoading(true);
-		setPendingPage(page);
+		setSearchResult(null);
 
-		// save searchQuery to queryRef
-		queryRef.current = searchQuery;
-
-		const requestId = ++reqRef.current;
-		
 		try {
-			const data = await searchByDate(searchQuery, page);
+			const data = await searchByDate(searchQuery, searchPage);
 
-			if (requestId === reqRef.current) {
-				// update state with search result
+			// update state with search result
 			setSearchResult(data);
-			setCurrentPage(page);
-			} else {
-				console.log("Ignored old answer (race condition stopped!")
-			}
+
 		} catch (err) {
-			if (requestId === reqRef.current) {
-			setError(err instanceof Error ? err.message : "Unknown error");
-		}
+			// handle any errors
+			console.error(`Error thrown when searching for "${searchQuery}":`, err);
+			setError(err instanceof Error
+				? err.message
+				: "Aouch, stop throwing things that are not Errors at me"
+			);
 		}
 
 		// set loading to false
 		setIsLoading(false);
-		setPendingPage(null);
 	}
 
 	const handleSubmit = (e: React.FormEvent) => {
@@ -66,17 +62,30 @@ const SearchPage = () => {
 		}
 
 		// search for haxx0rs 🕵🏻‍♂️
-		searchHackerNews(trimmedSearchInput, 0);
+		setPage(0);
+
+		// save searchQuery to URLSearchParams
+		setSearchParams({ query: trimmedSearchInput });
 	}
 
-	// A different way to type focus part 2 (longer!)
-/* 	useEffect(() => {
+	useEffect(() => {
+		if (!searchParamsQuery) {
+			setSearchResult(null);
+			return;
+		}
+
+		setInputSearch(searchParamsQuery);
+		searchHackerNews(searchParamsQuery, page);
+	}, [searchParamsQuery, page]);
+
+	useEffect(() => {
 		if (!inputSearchEl.current) {
 			return;
 		}
 
+		// 👀
 		inputSearchEl.current.focus();
-	}, []); */
+	}, []);
 
 	return (
 		<>
@@ -90,8 +99,8 @@ const SearchPage = () => {
 						placeholder="Enter your search query"
 						type="text"
 						value={inputSearch}
+						ref={inputSearchEl}
 						required
-						autoFocus
 					/>
 				</Form.Group>
 
@@ -107,11 +116,12 @@ const SearchPage = () => {
 			</Form>
 
 			{error && <Alert variant="warning">{error}</Alert>}
+
 			{isLoading && <p>🤔 Loading...</p>}
 
 			{searchResult && (
 				<div id="search-result">
-					<p>Showing {searchResult.nbHits} search results for "{queryRef.current}"...</p>
+					<p>Showing {searchResult.nbHits} search results for "{searchParamsQuery}"...</p>
 
 					<ListGroup className="mb-3">
 						{searchResult.hits.map((hit) => (
@@ -123,13 +133,12 @@ const SearchPage = () => {
 					</ListGroup>
 
 					<Pagination
-						currentPage={pendingPage !== null ? pendingPage : currentPage}
-						totalPages={Math.min(searchResult.nbPages, 50)}
-						onPageChange={(newPage) => {
-							if (!isLoading) {
-								searchHackerNews(queryRef.current, newPage)
-							}
-						}}
+						hasPreviousPage={searchResult.page > 0}
+						hasNextPage={searchResult.page + 1 < searchResult.nbPages}
+						onPreviousPage={() => setPage(prevValue => prevValue - 1)}
+						onNextPage={() => setPage(prevValue => prevValue + 1)}
+						page={searchResult.page + 1}
+						totalPages={searchResult.nbPages}
 					/>
 				</div>
 			)}
